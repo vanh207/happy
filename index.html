@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bất Ngờ Tình Yêu 20/10</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff6b93;
+            --secondary: #ffa5b9;
+            --accent: #ff4d7e;
+            --light: #fff5f7;
+            --dark: #333;
+            --text: #555;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 107, 147, 0.7);
+            background: linear-gradient(to right, #ff6b93, #ffa5b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 1.5s forwards 0.5s;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: #ffa5b9;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1.5s forwards 1s;
+        }
+
+        /* Fireworks Canvas */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Closed Letter */
+        .closed-letter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe4ec 100%);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            z-index: 50;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+        }
+
+        .closed-letter.show {
+            opacity: 1;
+        }
+
+        .closed-letter:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .letter-icon {
+            font-size: 4rem;
+            color: #ff4d7e;
+            margin-bottom: 15px;
+        }
+
+        .letter-text {
+            color: #ff4d7e;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Open Letter */
+        .letter-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .letter-container.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .letter {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe4ec 100%);
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0);
+            transition: transform 1s ease;
+            position: relative;
+        }
+
+        .letter-container.show .letter {
+            transform: scale(1);
+        }
+
+        .letter h2 {
+            color: #ff4d7e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .letter-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        .letter-content p {
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .letter-container.show .letter-content p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 30px;
+            color: #ff4d7e;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.5s ease 1s;
+        }
+
+        .letter-container.show .signature {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .letter-close {
+            background: linear-gradient(135deg, #ff6b93 0%, #ff4d7e 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .letter-close:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 147, 0.4);
+        }
+
+        /* Flower */
+        .flower {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .petal {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to bottom, #ff6b93, #ff4d7e);
+            border-radius: 50% 50% 50% 0;
+            transform-origin: bottom center;
+        }
+
+        .center {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        /* Music Controls */
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 300;
+        }
+
+        .music-btn {
+            background: linear-gradient(135deg, #ff6b93 0%, #ff4d7e 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(255, 107, 147, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes petal {
+            0% {
+                transform: rotate(0deg) translateY(0) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(var(--rotation)) translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .closed-letter {
+                width: 250px;
+                height: 180px;
+            }
+            
+            .letter {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .letter-content {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+    
+    <div class="container">
+        <h1>Happy women's day 💐 </h1>
+        <p class="subtitle">❤️ 20/10 vui vẻ nha  ❤️</p>
+    </div>
+
+    <!-- Closed Letter -->
+    <div class="closed-letter" id="closedLetter">
+        <i class="fas fa-envelope letter-icon"></i>
+        <div class="letter-text">Nhấn để mở thư</div>
+    </div>
+
+    <!-- Open Letter -->
+    <div class="letter-container" id="letterContainer">
+        <div class="letter">
+            <h2>Thư Gửi Chị Thúy</h2>
+            <div class="letter-content">
+ Gửi chị,
+
+<p>Nhân ngày Phụ nữ Việt Nam 20/10, em gửi đến chị những lời chúc tốt đẹp nhất. Chúc chị luôn bình an, hạnh phúc và thành công trong cuộc sống.</p><p>Dù chúng ta mới quen nhau, nhưng em rất trân trọng mối quan hệ này. Mỗi lần được trò chuyện cùng chị đều là những khoảnh khắc rất thoải mái và vui vẻ.</p><p>Em ấn tượng với sự chín chắn và cách cư xử tinh tế của chị. Chị luôn biết cách tạo ra không khí hòa hợp và vui vẻ cho mọi người xung quanh.</p><p>Nhân ngày đặc biệt này, em chúc chị:  Công việc thuận lợi, sự nghiệp thăng tiến, Gặp nhiều may mắn và niềm vui trong cuộc sống, Luôn tỏa sáng theo cách của riêng mình</p><p>Hy vọng rằng chúng ta sẽ có nhiều dịp để hiểu nhau hơn và cùng nhau chia sẻ những điều thú vị trong cuộc sống.</p>
+Chúc chị một ngày 20/10 thật ý nghĩa!
+                <div class="signature">
+                    Gửi chị guột <br>
+                     hẹ hẹ
+                </div>
+            </div>
+            <button class="letter-close" id="letterCloseBtn">Đóng thư</button>
+        </div>
+    </div>
+
+    <div class="music-controls">
+        <button class="music-btn" id="musicToggle">
+            <i class="fas fa-music"></i>
+        </button>
+    </div>
+
+    <!-- Audio element for background music -->
+    <audio id="backgroundMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const closedLetter = document.getElementById('closedLetter');
+            const letterContainer = document.getElementById('letterContainer');
+            const letterCloseBtn = document.getElementById('letterCloseBtn');
+            const musicToggle = document.getElementById('musicToggle');
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const fireworksCanvas = document.getElementById('fireworksCanvas');
+            
+            let musicPlaying = false;
+            let flowersCreated = 0;
+            let fireworksActive = false;
+
+            // Set canvas size
+            function resizeCanvas() {
+                fireworksCanvas.width = window.innerWidth;
+                fireworksCanvas.height = window.innerHeight;
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            const ctx = fireworksCanvas.getContext('2d');
+            
+            // Fireworks particles
+            class Particle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 10,
+                        y: (Math.random() - 0.5) * 10
+                    };
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.03 + 0.015;
+                    this.size = Math.random() * 3 + 1;
+                }
+                
+                update() {
+                    this.velocity.y += 0.05;
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                    this.alpha -= this.decay;
+                }
+                
+                draw() {
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            let particles = [];
+            
+            function createFirework(x, y) {
+                const colors = ['#ff6b93', '#ffa5b9', '#ff4d7e', '#ff8fab', '#ffd1dc'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                for (let i = 0; i < 100; i++) {
+                    particles.push(new Particle(x, y, color));
+                }
+            }
+            
+            function animateFireworks() {
+                if (!fireworksActive) return;
+                
+                ctx.fillStyle = 'rgba(10, 10, 30, 0.1)';
+                ctx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+                
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    
+                    if (particles[i].alpha <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+                
+                // Randomly create new fireworks
+                if (Math.random() < 0.05) {
+                    createFirework(
+                        Math.random() * fireworksCanvas.width,
+                        Math.random() * fireworksCanvas.height * 0.5
+                    );
+                }
+                
+                requestAnimationFrame(animateFireworks);
+            }
+
+            // Start fireworks
+            function startFireworks() {
+                fireworksActive = true;
+                animateFireworks();
+            }
+
+            // Stop fireworks
+            function stopFireworks() {
+                fireworksActive = false;
+            }
+
+            // Show closed letter after page loads
+            setTimeout(() => {
+                closedLetter.classList.add('show');
+            }, 2000);
+
+            // Create flower
+            function createFlower() {
+                if (flowersCreated >= 15) return;
+                
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.style.left = Math.random() * 90 + 5 + 'vw';
+                flower.style.top = Math.random() * 90 + 5 + 'vh';
+                
+                // Create petals
+                const petalCount = 8;
+                for (let i = 0; i < petalCount; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    petal.style.transform = `rotate(${i * (360 / petalCount)}deg) translateY(-20px)`;
+                    petal.style.setProperty('--rotation', `${i * (360 / petalCount)}deg`);
+                    petal.style.animation = `petal 3s ease-in-out forwards`;
+                    flower.appendChild(petal);
+                }
+                
+                // Create center
+                const center = document.createElement('div');
+                center.className = 'center';
+                flower.appendChild(center);
+                
+                document.body.appendChild(flower);
+                
+                // Animate flower appearance
+                setTimeout(() => {
+                    flower.style.opacity = '1';
+                    flowersCreated++;
+                    
+                    // Remove flower after animation
+                    setTimeout(() => {
+                        flower.style.opacity = '0';
+                        setTimeout(() => {
+                            flower.remove();
+                            flowersCreated--;
+                        }, 1000);
+                    }, 3000);
+                }, 100);
+            }
+
+            // Create floating flower
+            function createFloatingFlower() {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.style.left = Math.random() * 90 + 5 + 'vw';
+                flower.style.top = '100vh';
+                flower.style.animation = `floatUp ${Math.random() * 3 + 3}s ease-in-out forwards`;
+                
+                // Create petals
+                const petalCount = 8;
+                for (let i = 0; i < petalCount; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    petal.style.transform = `rotate(${i * (360 / petalCount)}deg) translateY(-20px)`;
+                    flower.appendChild(petal);
+                }
+                
+                // Create center
+                const center = document.createElement('div');
+                center.className = 'center';
+                flower.appendChild(center);
+                
+                document.body.appendChild(flower);
+                
+                // Animate flower appearance
+                setTimeout(() => {
+                    flower.style.opacity = '1';
+                    
+                    // Remove flower after animation
+                    setTimeout(() => {
+                        flower.remove();
+                    }, 5000);
+                }, 100);
+            }
+
+            // Show letter
+            function showLetter() {
+                closedLetter.style.display = 'none';
+                letterContainer.classList.add('show');
+                
+                // Add typewriter effect to paragraphs
+                const paragraphs = document.querySelectorAll('.letter-content p');
+                paragraphs.forEach((p, index) => {
+                    p.style.transitionDelay = (index * 0.5) + 's';
+                });
+                
+                // Start fireworks when letter opens
+                startFireworks();
+                
+                // Create flowers when letter opens
+                createMultipleFlowers();
+                
+                // Start music when letter opens
+                if (!musicPlaying) {
+                    toggleMusic();
+                }
+            }
+            
+            // Close letter
+            letterCloseBtn.addEventListener('click', function() {
+                letterContainer.classList.remove('show');
+                stopFireworks();
+                setTimeout(() => {
+                    closedLetter.style.display = 'flex';
+                }, 1000);
+            });
+
+            // Create multiple flowers
+            function createMultipleFlowers() {
+                // Create flowers around the letter
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        createFlower();
+                    }, i * 300);
+                }
+
+                // Create floating flowers continuously
+                const flowerInterval = setInterval(() => {
+                    if (flowersCreated < 20) {
+                        createFloatingFlower();
+                    }
+                }, 1000);
+
+                // Stop creating flowers after 30 seconds
+                setTimeout(() => {
+                    clearInterval(flowerInterval);
+                }, 30000);
+            }
+            
+            // Music controls
+            function toggleMusic() {
+                if (musicPlaying) {
+                    backgroundMusic.pause();
+                    musicToggle.innerHTML = '<i class="fas fa-music"></i>';
+                } else {
+                    backgroundMusic.play().catch(e => {
+                        console.log("Autoplay prevented. User interaction required.");
+                    });
+                    musicToggle.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+                musicPlaying = !musicPlaying;
+            }
+            
+            musicToggle.addEventListener('click', toggleMusic);
+            
+            // Open letter when clicked
+            closedLetter.addEventListener('click', showLetter);
+
+            // Also open letter when pressing Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    showLetter();
+                }
+            });
+
+            // Create random fireworks occasionally before letter opens
+            setInterval(() => {
+                if (!fireworksActive) {
+                    createFirework(
+                        Math.random() * fireworksCanvas.width,
+                        Math.random() * fireworksCanvas.height * 0.3
+                    );
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
